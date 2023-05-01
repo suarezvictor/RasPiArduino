@@ -47,6 +47,7 @@ uint8_t console_read(void);
 uint8_t console_peek(void);
 void console_flush(void);
 void console_write(uint8_t str);
+size_t console_write_buffer(const uint8_t *buffer, size_t size);
 int console_available(void);
 
 #ifdef __cplusplus
@@ -69,6 +70,7 @@ class LinuxConsole : public Stream{
     inline void begin(uint32_t baud __attribute__((unused))){}
     void end();
     virtual int available(void);
+    //virtual int availableForWrite();
     virtual int peek(void);
     virtual int read(void);
     virtual void flush(void);
@@ -77,7 +79,8 @@ class LinuxConsole : public Stream{
     inline size_t write(long n) { return write((uint8_t)n); }
     inline size_t write(unsigned int n) { return write((uint8_t)n); }
     inline size_t write(int n) { return write((uint8_t)n); }
-    using Print::write; // pull in write(str) and write(buf, size) from Print
+    virtual size_t write(const uint8_t *buffer, size_t size);
+    using Print::write; // pull in write(str) from Print
     operator bool() { return true; }
 };
 

@@ -22,10 +22,10 @@
 #ifndef Arduino_h
 #define Arduino_h
 
-#include "bcm2835_registers.h"
+//#include "bcm2835_registers.h"
 #include <math.h>
 #include <pthread.h>
-#include "pgmspace.h"
+//#include "pgmspace.h"
 
 #ifdef __cplusplus
 extern "C"{
@@ -71,9 +71,12 @@ void yield(void);
 #ifdef abs
 #undef abs
 #endif
-
+#ifndef min
 #define min(a,b) ((a)<(b)?(a):(b))
+#endif
+#ifndef max
 #define max(a,b) ((a)>(b)?(a):(b))
+#endif
 #define abs(x) ((x)>0?(x):-(x))
 #define constrain(amt,low,high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define round(x)     ((x)>=0?(long)((x)+0.5):(long)((x)-0.5))
@@ -105,8 +108,6 @@ void yield(void);
 
 #define bit(b) (1UL << (b))
 
-#define micros() (unsigned long)(STCV)
-#define millis() (unsigned long)(STCV / 1000)
 
 typedef unsigned int word;
 typedef uint8_t boolean;
@@ -185,7 +186,7 @@ void uart_check_fifos();
 #include "HardwareSerial.h"
 
 uint16_t makeWord(uint16_t w);
-uint16_t makeWord(byte h, byte l);
+unsigned int makeWord(unsigned char h, unsigned char l);
 
 #define word(...) makeWord(__VA_ARGS__)
 

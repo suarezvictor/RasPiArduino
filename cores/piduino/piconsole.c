@@ -30,6 +30,7 @@ volatile char console_rx_buffer[1024];
 volatile int console_rx_buffer_index = 0;
 
 volatile uint8_t console_thread_running = 0;
+int console_israw = 0;
 
 void console_begin(){
     console_thread_running = 1;
@@ -44,7 +45,8 @@ void console_end(){
 }
 
 void console_run(void){
-    if(console_thread_running && !console_rx_empty() && console_rx_buffer_index < 1024){
+    while(console_thread_running && !console_rx_empty() && console_rx_buffer_index < 1024)
+    {
         console_rx_buffer[console_rx_buffer_index++] = console_rx();
     }
 }
@@ -66,7 +68,8 @@ uint8_t console_rx(){
     char ch;
     read(STDIN_FILENO, &ch, 1);
     fflush(stdin);
-    if(ch == 3) console_signal_handler(SIGINT);//Ctrl+C received and sig handlers are not initialized
+    if(!console_israw && ch == 3)
+    	console_signal_handler(SIGINT);//Ctrl+C received and sig handlers are not initialized
     return ch;
 }
 
@@ -93,12 +96,20 @@ void console_write(uint8_t data){
     console_tx(data);
 }
 
+
+size_t console_write_buffer(const uint8_t *buffer, size_t size){
+    write(STDOUT_FILENO, buffer, size);
+    fflush(stdout);
+    return size;
+}
+
+
 int console_available(){
     return console_rx_buffer_index;
 }
 
 void console_flush(void){
-    fflush(stdin);
+    fflush(stdout);
 }
 
 void console_echo(){
@@ -119,6 +130,7 @@ void console_mode_raw(){
     struct termios term;
     tcgetattr(STDIN_FILENO, &term);
     term.c_lflag &= ~ICANON;
+    console_israw = 1;
     tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 
@@ -126,6 +138,7 @@ void console_mode_line(){
     struct termios term;
     tcgetattr(STDIN_FILENO, &term);
     term.c_lflag |= ICANON;
+    console_israw = 0;
     tcsetattr(STDIN_FILENO, TCSANOW, &term);
 }
 

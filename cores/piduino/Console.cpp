@@ -47,6 +47,8 @@ int LinuxConsole::peek(void){
 int LinuxConsole::read(void){
     if(idemonitor_connected() && idemonitor_available())
         return idemonitor_read_char();
+    if(!console_available())
+        return -1;
     return console_read();
 }
 
@@ -60,6 +62,13 @@ size_t LinuxConsole::write(uint8_t c){
         idemonitor_write((char*)&c, 1);
     console_write(c);
     return 1;
+}
+
+size_t LinuxConsole::write(const uint8_t *buffer, size_t size)
+{
+    if(idemonitor_connected())
+        idemonitor_write((char*)buffer, size);
+    return console_write_buffer(buffer, size);
 }
 
 LinuxConsole Console;

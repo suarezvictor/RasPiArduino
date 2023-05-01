@@ -40,7 +40,7 @@ uint8_t idemonitor_connected(){
     return (_server_running && _client_socket > 0);
 }
 
-int idemonitor_begin(){
+int idemonitor_begin(void){
     _server_running = 0;
     _rx_fill = 0;
     _client_socket = -1;

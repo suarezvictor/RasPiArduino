@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-void idemonitor_begin(void);
+int idemonitor_begin(void);
 void idemonitor_run(void);
 uint8_t idemonitor_connected();
 int idemonitor_write(char * data, size_t len);
